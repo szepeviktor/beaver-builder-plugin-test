@@ -1,0 +1,98 @@
+# Remove class instantiation:
+# grep -rl '^FL\S\+::init()' classes/ extensions/ includes/ modules/|xargs -t -L1 sed -e 's#^FL\S\+::init()#true || &#' -i
+# grep -rl '^FL\S\+::\S\+(' classes/ extensions/ includes/ modules/|xargs -t -L1 sed -e 's#^FL\S\+::\S\+(#true || &#' -i
+# Start: composer install && vendor/bin/phpstan analyze
+
+parameters:
+    level: 2
+    paths:
+        - %currentWorkingDirectory%/
+        - %currentWorkingDirectory%/includes/updater/classes/
+    autoload_files:
+        - %currentWorkingDirectory%/vendor/giacocorsiglia/wordpress-stubs/wordpress-stubs.php
+        - %currentWorkingDirectory%/tests/wordpress-importer-stubs.php
+        - %currentWorkingDirectory%/tests/phpstan-bootstrap.php
+        - %currentWorkingDirectory%/includes/compatibility.php
+        - %currentWorkingDirectory%/classes/class-fl-builder-filesystem.php
+#    autoload_directories:
+    excludes_analyse:
+        - %currentWorkingDirectory%/vendor/
+        # Composer packages and templates
+        - %currentWorkingDirectory%/includes/
+        # Module templates
+        - %currentWorkingDirectory%/modules/accordion/includes/
+        - %currentWorkingDirectory%/modules/audio/includes/
+        - %currentWorkingDirectory%/modules/button/includes/
+        - %currentWorkingDirectory%/modules/callout/includes/
+        - %currentWorkingDirectory%/modules/contact-form/includes/
+        - %currentWorkingDirectory%/modules/content-slider/includes/
+        - %currentWorkingDirectory%/modules/countdown/includes/
+        - %currentWorkingDirectory%/modules/cta/includes/
+        - %currentWorkingDirectory%/modules/gallery/includes/
+        - %currentWorkingDirectory%/modules/heading/includes/
+        - %currentWorkingDirectory%/modules/html/includes/
+        - %currentWorkingDirectory%/modules/icon-group/includes/
+        - %currentWorkingDirectory%/modules/icon/includes/
+        - %currentWorkingDirectory%/modules/map/includes/
+        - %currentWorkingDirectory%/modules/menu/includes/
+        - %currentWorkingDirectory%/modules/numbers/includes/
+        - %currentWorkingDirectory%/modules/photo/includes/
+        - %currentWorkingDirectory%/modules/post-carousel/includes/
+        - %currentWorkingDirectory%/modules/post-grid/includes/
+        - %currentWorkingDirectory%/modules/post-slider/includes/
+        - %currentWorkingDirectory%/modules/pricing-table/includes/
+        - %currentWorkingDirectory%/modules/rich-text/includes/
+        - %currentWorkingDirectory%/modules/separator/includes/
+        - %currentWorkingDirectory%/modules/sidebar/includes/
+        - %currentWorkingDirectory%/modules/slideshow/includes/
+        - %currentWorkingDirectory%/modules/social-buttons/includes/
+        - %currentWorkingDirectory%/modules/subscribe-form/includes/
+        - %currentWorkingDirectory%/modules/tabs/includes/
+        - %currentWorkingDirectory%/modules/testimonials/includes/
+        - %currentWorkingDirectory%/modules/video/includes/
+        - %currentWorkingDirectory%/modules/widget/includes/
+        - %currentWorkingDirectory%/modules/woocommerce/includes/
+        # Extensions
+        - %currentWorkingDirectory%/extensions/fl-builder-cache-helper/includes/
+        - %currentWorkingDirectory%/extensions/fl-builder-core-templates-admin/includes/
+        - %currentWorkingDirectory%/extensions/fl-builder-template-data-exporter/includes/
+        - %currentWorkingDirectory%/extensions/fl-builder-templates-override/includes/
+        - %currentWorkingDirectory%/extensions/fl-builder-user-templates/includes/
+        - %currentWorkingDirectory%/extensions/fl-builder-white-label/includes/
+        # WP-CLI
+        - %currentWorkingDirectory%/classes/class-fl-builder-wpcli-command.php
+        # Tests
+        - %currentWorkingDirectory%/tests/
+    ignoreErrors:
+        - '#^Function add_query_arg invoked with [23] parameters, 0 required\.$#'
+#        - '#^Function remove_filter invoked with [4] parameters, 2-3 required\.$#'
+        - '#^Function do_action invoked with [34567] parameters, 1-2 required\.$#'
+        - '#^Function apply_filters invoked with [345] parameters, 2 required\.$#'
+        - '#^Function current_user_can invoked with 2 parameters, 1 required\.$#'
+        # Page cache plugins
+        - '#^Call to static method \S+\(\) on an unknown class WpeCommon\.$#'
+        - '#^Call to static method clearall\(\) on an unknown class autoptimizeCache\.$#'
+        - '#^Call to static method breeze_cache_flush\(\) on an unknown class Breeze_PurgeCache\.$#'
+        - '#^Call to static method clear_total_cache\(\) on an unknown class Cache_Enabler\.$#'
+        - '#^Call to static method ban\(\) on an unknown class WPaaS\\Cache\.$#'
+        - '#^Call to static method get_module\(\) on an unknown class WP_Hummingbird_Utils\.$#'
+        - '#^Call to static method log_msg\(\) on an unknown class WP_Hummingbird_Module_Page_Cache\.$#'
+        - '#^Call to static method purge_all\(\) on an unknown class LiteSpeed_Cache_API\.$#'
+        - '#^Instantiated class PagelyCachePurge not found\.$#'
+        - '#^Function sg_cachepress_purge_cache not found\.$#'
+        - '#^Function wp_cache_clear_cache not found\.$#'
+        - '#^Call to static method clear_all_cache\(\) on an unknown class Swift_Performance_Cache\.$#'
+        # Services
+        - '#^Call to static method get\(\) on an unknown class WYSIJA\.$#'
+        - '#^Instantiated class MailPoet\\Listing\\Handler not found\.$#'
+        - '#^Instantiated class MailPoet\\Models\\Subscriber not found\.$#'
+        - '#^Instantiated class CS_Rest_Subscribers not found\.$#'
+        # Tagged as FIXME in patch1
+        - '#^Call to an undefined static method FLBuilderUserTemplates::register_post_type\(\)\.$#'
+        - '#^Result of static method FLBuilderCSS::responsive_rule\(\) \(void\) is used\.$#'
+        - '#^Call to an undefined static method FLBuilderModel::install_database\(\)\.$#'
+        - '#^Static method FLBuilderWhiteLabel::theme_gettext\(\) invoked with 1 parameter, 3 required\.$#'
+        - '#^Static method FLBuilderCoreTemplatesAdmin::update_template\(\) invoked with 2 parameters, 0 required\.$#'
+        - '#^Static method FLBuilderCoreTemplatesAdmin::delete_template\(\) invoked with 1 parameter, 0 required\.$#'
+        # Poorly written code ( ! $nonBoolean )
+        - '#^Variable \$\S+ might not be defined\.$#'
